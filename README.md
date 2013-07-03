@@ -2,12 +2,14 @@ Kohana RESTful API Module
 =========================
 
 
-This is yet another RESTful API module for Kohana, which started as a port from Kohana's core REST module in 3.1.1.1, and developed into a much more complete solution.
+This is yet another RESTful API module for Kohana, which started as a port from Kohana's core REST module in 3.1.1.1, and developed into a much more complete solution with many sweet features.
+
+The module currently supports Kohana 3.3.
 
 My role models:
 
-http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
-https://blog.apigee.com/taglist/restful
+* http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
+* https://blog.apigee.com/taglist/restful
 
 
 Basic Usage
