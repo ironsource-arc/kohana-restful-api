@@ -1,7 +1,5 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-abstract class Controller_REST extends Kohana_Controller_REST {}
-
 /**
  * A take on Kohana's REST controller from version 3.1.1.1,
  * with some extra goodies.
@@ -28,7 +26,7 @@ abstract class Controller_REST extends Kohana_Controller_REST {}
  * @category Controller
  * @author   Kohana Team, Alon Pe'er, Adi Oz
  */
-abstract class Controller_REST extends Controller {
+abstract class Kohana_Controller_REST extends Controller {
 
 	/**
 	 * REST types
@@ -102,6 +100,11 @@ abstract class Controller_REST extends Controller {
 	 */
 	public $output_format;
 
+	/**
+	 * Delimiter and enclosure for CSV formatted output.
+	 */
+	const CSV_DELIMITER = ',';
+	const CSV_ENCLOSURE = '"';
 
 	/**
 	 * Checks the requested method against the available methods. If the method
@@ -274,7 +277,7 @@ abstract class Controller_REST extends Controller {
 			$handle = fopen('php://temp', 'r+');
 			foreach ($data as $line)
 			{
-				fputcsv($handle, (array) $line, ',', '"');
+				fputcsv($handle, (array) $line, self::CSV_DELIMITER, self::CSV_ENCLOSURE);
 			}
 			rewind($handle);
 			while (!feof($handle))
