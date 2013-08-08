@@ -12,7 +12,7 @@ abstract class Kohana_RestUser {
 	/**
 	 * User authentication types.
 	 */
-	const AUTH_OFF			= 'off'; // No authentication, so no user. USE WITH CAUTION!
+	const AUTH_TYPE_OFF		= 'off'; // No authentication, so no user. USE WITH CAUTION!
 	const AUTH_TYPE_APIKEY	= 'apikey'; // User passes an API key.
 	const AUTH_TYPE_SECRET	= 'secret'; // User passes an API key and another secret key.
 	const AUTH_TYPE_HASH	= 'hash'; // User passes a hashed string. See _auth_hash() for more information.
@@ -43,16 +43,16 @@ abstract class Kohana_RestUser {
 		$_loaded,
 		$_auth_type,
 		$_auth_source,
-		$_api_key,
-		$_secret_key
+		$_api_key
 	;
 
 	/**
 	 * Variables that the method _find() is required to populate.
 	 */
 	protected
-		$_id,	// The user's unique identifier, usually an integer.
-		$_roles	// An array of roles that the user has. More inf in README.md.
+		$_id,			// The user's unique identifier, usually an integer.
+		$_secret_key,	// (Optional) The user's secret key, used in some of the authentication types.
+		$_roles			// An array of roles that the user has. More inf in README.md.
 	;
 
 	/**
@@ -159,7 +159,7 @@ abstract class Kohana_RestUser {
 
 		if ($this->_auth_source & self::AUTH_SOURCE_GET)
 		{
-			$value = Request::$current->param($key);
+			$value = Request::$current->query($key);
 		}
 
 		if ($this->_auth_source & self::AUTH_SOURCE_HEADER)
@@ -178,9 +178,9 @@ abstract class Kohana_RestUser {
 	{
 		$this->_actions = array();
 
-		foreach ((array) Kohana::$config->load('acl') as $action => $groups)
+		foreach ((array) Kohana::$config->load('acl') as $action => $roles)
 		{
-			if (count(array_intersect($this->_groups, $groups)) > 0)
+			if (count(array_intersect($this->_roles, $roles)) > 0)
 			{
 				$this->_actions[$action] = true;
 			}

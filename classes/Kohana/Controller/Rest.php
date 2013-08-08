@@ -73,7 +73,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 *
 	 * @var string
 	 */
-	protected $_auth_type = RestUser::AUTH_OFF;
+	protected $_auth_type = RestUser::AUTH_TYPE_OFF;
 
 	/**
 	 * Set the authentication source.
@@ -252,6 +252,8 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 * Format the output data to CSV.
 	 * Requires the data to be a 2-dimensional array.
 	 * 1-dimension arrays are also supported, by converting them to 2-dimensions.
+	 *
+	 * @TODO This doesn't really work well with arrays, requires deeper inspection.
 	 */
 	private function _format_csv($data = array())
 	{
@@ -382,7 +384,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 */
 	private function _auth()
 	{
-		if (RestUser::AUTH_OFF != $this->_auth_type)
+		if (RestUser::AUTH_TYPE_OFF != $this->_auth_type)
 		{
 			$this->_user = new RestUser($this->_auth_type, $this->_auth_source);
 		}
