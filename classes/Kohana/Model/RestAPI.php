@@ -30,13 +30,15 @@ class Kohana_Model_RestAPI extends Kohana_Model {
 	 *   Requires support of the specific model.
 	 * @return Model_RestAPI
 	 */
-	public static function factory($name, RestUser &$user = null, array $extra = null) {
+	public static function factory($name, RestUser &$user = null, array $extra = null)
+	{
 		// Add the model prefix
 		$class = 'Model_'.$name;
 		return new $class($user, $extra);
 	}
 
-	public function __construct(RestUser &$user = null) {
+	public function __construct(RestUser &$user = null)
+	{
 		$this->_user = $user;
 	}
 

@@ -22,6 +22,8 @@
  * Additional methods can be supported by adding the method and action to
  * the `$_action_map` property.
  *
+ * @TODO Rename to Controller_RestAPI, like the model and task.
+ *
  * @package  RESTfulAPI
  * @category Controller
  * @author   Kohana Team, Alon Pe'er, Adi Oz
@@ -69,21 +71,18 @@ abstract class Kohana_Controller_REST extends Controller {
 	);
 
 	/**
-	 * User authentication types.
+	 * Set the authentication type.
+	 *
+	 * @var string
 	 */
-	const AUTH_OFF				= 0; // No authentication, USE WITH CAUTION!
-	// @TODO Implement and uncomment!
-	// const AUTH_HEADER			= 1; // Authentication with HTTP header (default).
-	// const AUTH_HEADER_REQUEST	= 2; // Same as AUTH_HEADER, but support for getting the header string in the $_REQUEST. USE WITH CAUTION.
-	// const AUTH_REQUEST			= 3; // Authentication with request parameters.
-	// const AUTH_SESSION			= 4; // Authentication with session data (requires logging in).
+	protected $_auth_type = RestUser::AUTH_OFF;
 
 	/**
-	 * Set the authentication type.
+	 * Set the authentication source.
 	 *
 	 * @var integer
 	 */
-	protected $_auth_type = self::AUTH_OFF;
+	protected $_auth_source = RestUser::AUTH_SOURCE_GET;
 
 	/**
 	 * Should non-200 response codes be suppressed.
@@ -243,7 +242,7 @@ abstract class Kohana_Controller_REST extends Controller {
 
 	/**
 	 * Format the output data to XML.
-	 * @TODO Improve this implementation (or maybe not because XML is dead).
+	 * @TODO Improve this implementation (or maybe not, because XML is dead).
 	 */
 	private function _format_xml($data = array())
 	{
@@ -385,9 +384,9 @@ abstract class Kohana_Controller_REST extends Controller {
 	 */
 	private function _auth()
 	{
-		if (self::AUTH_OFF != $this->_auth_type)
+		if (RestUser::AUTH_OFF != $this->_auth_type)
 		{
-			$this->_user = RestUser::factory($this->_auth_type, $params);
+			$this->_user = new RestUser($this->_auth_type, $this->_auth_source);
 		}
 	}
 

@@ -3,6 +3,8 @@
 /**
  * An example controller that implements a RESTful API.
  *
+ * @TODO Move all default action functions into the REST parent class.
+ *
  * @package  RESTfulAPI
  * @category Controller
  * @author   Alon Pe'er
@@ -16,6 +18,8 @@ class Controller_Restexample extends Controller_REST {
 	 */
 	protected $_rest;
 
+	protected $_auth_source = RestUser::AUTH_SOURCE_GET;
+	protected $_auth_type = RestUser::AUTH_TYPE_APIKEY;
 
 	/**
 	 * Initialize the example model.
