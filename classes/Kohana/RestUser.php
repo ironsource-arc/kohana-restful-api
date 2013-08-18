@@ -60,9 +60,7 @@ abstract class Kohana_RestUser {
 	 */
 	private $_actions;
 
-	/**
-	 * @TODO comment
-	 */
+
 	public function __construct($auth_type, $auth_source)
 	{
 		$this->_auth_type = $auth_type; // @TODO validate
@@ -73,7 +71,7 @@ abstract class Kohana_RestUser {
 	}
 
 	/**
-	 * @TODO comment
+	 * Authorizes the user.
 	 */
 	protected function _auth()
 	{
@@ -94,7 +92,9 @@ abstract class Kohana_RestUser {
 	}
 
 	/**
-	 * @TODO Add a description of the hash structure.
+	 * This function validates the hashed signature.
+	 * Check out the implementation of get_auth() to understand
+	 * how a valid hashed signature must be generated.
 	 */
 	protected function _auth_hash($hash)
 	{

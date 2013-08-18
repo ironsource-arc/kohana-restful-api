@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+§<?php defined('SYSPATH') or die('No direct script access.');
 
 /**
  * A take on Kohana's REST controller from version 3.1.1.1,
@@ -22,8 +22,6 @@
  * Additional methods can be supported by adding the method and action to
  * the `$_action_map` property.
  *
- * @TODO Rename to Controller_RestAPI, like the model and task.
- *
  * @package  RESTfulAPI
  * @category Controller
  * @author   Kohana Team, Alon Pe'er, Adi Oz
@@ -46,7 +44,7 @@ abstract class Kohana_Controller_REST extends Controller {
 	/**
 	 * User object for authentication.
 	 *
-	 * @var Model_User
+	 * @var RestUser
 	 */
 	protected $_user;
 
