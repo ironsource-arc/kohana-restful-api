@@ -1,4 +1,4 @@
-§<?php defined('SYSPATH') or die('No direct script access.');
+<?php defined('SYSPATH') or die('No direct script access.');
 
 /**
  * A take on Kohana's REST controller from version 3.1.1.1,
