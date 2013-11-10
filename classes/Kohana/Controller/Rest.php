@@ -228,7 +228,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	private function _format_json($data = array())
 	{
 		// Support JSONP requests.
-		if ($callback = $this->request->query('callback') && 200 == $this->response->status())
+		if ( ($callback = $this->request->query('callback')) && 200 == $this->response->status())
 		{
 			return $callback .'('. json_encode($data) .')';
 		}
