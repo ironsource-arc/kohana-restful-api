@@ -157,14 +157,16 @@ abstract class Kohana_RestUser {
 	{
 		$value = null;
 
-		if ($this->_auth_source & self::AUTH_SOURCE_GET)
-		{
-			$value = Request::$current->query($key);
-		}
-
 		if ($this->_auth_source & self::AUTH_SOURCE_HEADER)
 		{
 			$value = (string) Request::$current->headers($key);
+		}
+
+		// Header auth is stronger than query auth, so fall back on this only
+		// if header auth failed.
+		if (empty($value) && ($this->_auth_source & self::AUTH_SOURCE_GET))
+		{
+			$value = Request::$current->query($key);
 		}
 
 		return $value;
