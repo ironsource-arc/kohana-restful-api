@@ -108,9 +108,6 @@ abstract class Kohana_RestUser {
 		$split = array_filter(explode(':', base64_decode($hash)));
 		if (count($split) != 3)
 		{
-			//$this->_api_key 	= 'alon';
-			//$this->_secret_key 	= 'abc';
-			//die($this->get_auth());
 			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
 			$exception->headers('WWW-Authenticate', 'None');
 			throw $exception;
@@ -123,9 +120,6 @@ abstract class Kohana_RestUser {
 
 		// Validate timestamp.
 		if (time() > ($timestamp + (60 * self::MAX_AUTH_TIME))) {
-			//$this->_api_key 	= 'alon';
-			//$this->_secret_key 	= 'abc';
-			//die($this->get_auth());
 			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
 			$exception->headers('WWW-Authenticate', 'None');
 			throw $exception;
