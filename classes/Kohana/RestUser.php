@@ -86,7 +86,9 @@ abstract class Kohana_RestUser {
 			$this->_load();
 			if (self::AUTH_TYPE_SECRET == $this->_auth_type && $this->_secret_key != $this->_get_auth_param(self::AUTH_KEY_SECRET))
 			{
-				throw HTTP_Exception::factory(401, 'Invalid API or secret key');
+				$exception 	= HTTP_Exception::factory(401, 'Invalid API or secret key');
+				$exception->headers('WWW-Authenticate', 'None');
+				throw $exception;
 			}
 		}
 	}
@@ -106,7 +108,12 @@ abstract class Kohana_RestUser {
 		$split = array_filter(explode(':', base64_decode($hash)));
 		if (count($split) != 3)
 		{
-			throw HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			//$this->_api_key 	= 'alon';
+			//$this->_secret_key 	= 'abc';
+			//die($this->get_auth());
+			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			$exception->headers('WWW-Authenticate', 'None');
+			throw $exception;
 		}
 
 		$this->_api_key = $split[0];
@@ -116,14 +123,21 @@ abstract class Kohana_RestUser {
 
 		// Validate timestamp.
 		if (time() > ($timestamp + (60 * self::MAX_AUTH_TIME))) {
-			throw HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			//$this->_api_key 	= 'alon';
+			//$this->_secret_key 	= 'abc';
+			//die($this->get_auth());
+			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			$exception->headers('WWW-Authenticate', 'None');
+			throw $exception;
 		}
 
 		// We load the user now, so that we can validate the hashed timestamp with the secret key.
 		$this->_load();
 
 		if (!$this->_secret_key || $secret_hash !== md5($timestamp . $this->_secret_key)) {
-			throw HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
+			$exception->headers('WWW-Authenticate', 'None');
+			throw $exception;
 		}
 	}
 
@@ -136,7 +150,9 @@ abstract class Kohana_RestUser {
 		$this->_find();
 		if (is_null($this->_id))
 		{
-			throw HTTP_Exception::factory(401, 'Unknown user');
+			$exception 	= HTTP_Exception::factory(401, 'Unknown user');
+			$exception->headers('WWW-Authenticate', 'None');
+			throw $exception;
 		}
 		$this->_loaded = true;
 	}
