@@ -56,19 +56,6 @@ abstract class Kohana_Controller_Rest extends Controller {
 	protected $_params;
 
 	/**
-	 * Default fallback error messages.
-	 *
-	 * @var array
-	 */
-	protected $_defaultErrorMessages = array
-	(
-		400 => 'Bad request',
-		401 => 'Unauthorized request',
-		403 => 'Forbidden operation',
-		500 => 'An internal error has occurred',
-	);
-
-	/**
 	 * Set the authentication type.
 	 *
 	 * @var string
@@ -412,9 +399,9 @@ abstract class Kohana_Controller_Rest extends Controller {
 		}
 
 		// Support fallback on default HTTP error messages.
-		if (!$message && isset($this->_defaultErrorMessages[$code]))
+		if (!$message && isset(Response::$messages[$code]))
 		{
-			$message = $this->_defaultErrorMessages[$code];
+			$message = Response::$messages[$code];
 		}
 
 		$output = array
