@@ -86,9 +86,7 @@ abstract class Kohana_RestUser {
 			$this->_load();
 			if (self::AUTH_TYPE_SECRET == $this->_auth_type && $this->_secret_key != $this->_get_auth_param(self::AUTH_KEY_SECRET))
 			{
-				$exception 	= HTTP_Exception::factory(401, 'Invalid API or secret key');
-				$exception->headers('WWW-Authenticate', 'None');
-				throw $exception;
+				throw $this->_altered_401_exception('Invalid API or secret key');
 			}
 		}
 	}
@@ -108,9 +106,7 @@ abstract class Kohana_RestUser {
 		$split = array_filter(explode(':', base64_decode($hash)));
 		if (count($split) != 3)
 		{
-			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
-			$exception->headers('WWW-Authenticate', 'None');
-			throw $exception;
+			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
 		}
 
 		$this->_api_key = $split[0];
@@ -120,18 +116,14 @@ abstract class Kohana_RestUser {
 
 		// Validate timestamp.
 		if (time() > ($timestamp + (60 * self::MAX_AUTH_TIME))) {
-			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
-			$exception->headers('WWW-Authenticate', 'None');
-			throw $exception;
+			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
 		}
 
 		// We load the user now, so that we can validate the hashed timestamp with the secret key.
 		$this->_load();
 
 		if (!$this->_secret_key || $secret_hash !== md5($timestamp . $this->_secret_key)) {
-			$exception 	= HTTP_Exception::factory(401, 'Invalid '. self::AUTH_KEY_HASH .' value');
-			$exception->headers('WWW-Authenticate', 'None');
-			throw $exception;
+			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
 		}
 	}
 
@@ -144,11 +136,20 @@ abstract class Kohana_RestUser {
 		$this->_find();
 		if (is_null($this->_id))
 		{
-			$exception 	= HTTP_Exception::factory(401, 'Unknown user');
-			$exception->headers('WWW-Authenticate', 'None');
-			throw $exception;
+			throw $this->_altered_401_exception('Unknown user');
 		}
 		$this->_loaded = true;
+	}
+
+	/**
+	 * Returns a 401 HTTP_Exception with a "www-authenticate" header, in order to bypass
+	 * Kohana 3.3's exception on missing such header (based on @ehlersd's solution).
+	 */
+	private function _altered_401_exception($message = NULL)
+	{
+		$exception = HTTP_Exception::factory(401, $message);
+		$exception->headers('www-authenticate', 'None');
+		return $exception;
 	}
 
 	/**
