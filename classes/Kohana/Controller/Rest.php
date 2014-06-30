@@ -168,7 +168,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 			$data = array
 			(
 				'code'  => 404,
-				'error' => 'No records found',
+				'error' => __('No records found'),
 			);
 			$code = 404;
 		}
