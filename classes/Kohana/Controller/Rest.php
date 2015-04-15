@@ -26,7 +26,7 @@
  * @category Controller
  * @author   Kohana Team, Alon Pe'er, Adi Oz
  */
-abstract class Kohana_Controller_Rest extends Controller {
+abstract class Kohana_Controller_Rest extends Kohana_Controller {
 
 	/**
 	 * REST types
