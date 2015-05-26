@@ -156,7 +156,7 @@ You may create requests to your REST API using CLI commands. The following param
 
 Thanks a lot to [ozadi3](https://github.com/ozadi3), I couldn't have this without you!
 
-The module is maintained by [SupersonicAds](http://www.supersonicads.com).
+The module is maintained by [Supersonic](http://www.supersonic.com).
 
 ## Contributing
 
@@ -164,5 +164,4 @@ As usual, [fork and send pull requests](https://help.github.com/articles/fork-a-
 
 ## Getting Help
 
-* [Contact me](https://github.com/alonpeer).
 * Open issues in this project.
