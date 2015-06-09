@@ -78,13 +78,13 @@ abstract class Kohana_RestUser {
 		if (self::AUTH_TYPE_HASH == $this->_auth_type)
 		{
 			// We add the "Basic " prefix here, so that the GET parameter doesn't need to provide it.
-			$this->_auth_hash($this->_get_auth_param(self::AUTH_KEY_HASH));
+			$this->_auth_hash($this->_get_auth_param(static::AUTH_KEY_HASH));
 		}
 		else
 		{
-			$this->_api_key = $this->_get_auth_param(self::AUTH_KEY_API);
+			$this->_api_key = $this->_get_auth_param(static::AUTH_KEY_API);
 			$this->_load();
-			if (self::AUTH_TYPE_SECRET == $this->_auth_type && $this->_secret_key != $this->_get_auth_param(self::AUTH_KEY_SECRET))
+			if (self::AUTH_TYPE_SECRET == $this->_auth_type && $this->_secret_key != $this->_get_auth_param(static::AUTH_KEY_SECRET))
 			{
 				throw $this->_altered_401_exception('Invalid API or secret key');
 			}
@@ -106,7 +106,7 @@ abstract class Kohana_RestUser {
 		$split = array_filter(explode(':', base64_decode($hash)));
 		if (count($split) != 3)
 		{
-			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
+			throw $this->_altered_401_exception('Invalid '. static::AUTH_KEY_HASH .' value');
 		}
 
 		$this->_api_key = $split[0];
@@ -116,14 +116,14 @@ abstract class Kohana_RestUser {
 
 		// Validate timestamp.
 		if (time() > ($timestamp + (60 * self::MAX_AUTH_TIME))) {
-			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
+			throw $this->_altered_401_exception('Invalid '. static::AUTH_KEY_HASH .' value');
 		}
 
 		// We load the user now, so that we can validate the hashed timestamp with the secret key.
 		$this->_load();
 
 		if (!$this->_secret_key || $secret_hash !== md5($timestamp . $this->_secret_key)) {
-			throw $this->_altered_401_exception('Invalid '. self::AUTH_KEY_HASH .' value');
+			throw $this->_altered_401_exception('Invalid '. static::AUTH_KEY_HASH .' value');
 		}
 	}
 
