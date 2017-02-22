@@ -116,7 +116,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 			$this->request->action($this->_action_map[$method]);
 		}
 
-		$this->_init_params();
+		$this->init_params();
 
 		// Get output format from route file extension.
 		$this->output_format = $this->request->param('format');
@@ -337,7 +337,7 @@ abstract class Kohana_Controller_Rest extends Controller {
 	 * Initializes the request params array based on the current request.
 	 * @TODO support other exotic methods.
 	 */
-	private function _init_params()
+	protected function init_params()
 	{
 		$this->_params = array();
 
