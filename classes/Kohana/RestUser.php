@@ -26,8 +26,8 @@ abstract class Kohana_RestUser {
 	/**
 	 * Request parameter names.
 	 */
-	const AUTH_KEY_API		= 'apiKey'; // The API key parameter name expected in the request.
-	const AUTH_KEY_SECRET	= 'secretKey'; // The secret key parameter name expected in the request.
+	const AUTH_KEY_API		= 'apikey'; // The API key parameter name expected in the request.
+	const AUTH_KEY_SECRET	= 'secretkey'; // The secret key parameter name expected in the request.
 	const AUTH_KEY_HASH		= 'authorization'; // The hash parameter name expected in the request.
 
 	/**

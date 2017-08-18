@@ -44,7 +44,7 @@ Recommended bootstrap route:
 		
 ### Controllers
 
-Each REST controller in your app must extend `Controller_Rest`. Your controller will then have access to the following variables:
+Each REST controller in your app must extend `REST`. Your controller will then have access to the following variables:
 
 * `$this->_params` - an associated array with all the parameters passed in the request, no matter which method was used.
 * `$this->_user`, `$this->_auth_type` and `$this->_auth_source` - user authorization stuff. Read the User Authorization section below for more info.
@@ -156,7 +156,7 @@ You may create requests to your REST API using CLI commands. The following param
 
 Thanks a lot to [ozadi3](https://github.com/ozadi3), I couldn't have this without you!
 
-The module is maintained by [Supersonic](http://www.supersonic.com).
+The module is maintained by [Omnify](https://www.getomnify.com).
 
 ## Contributing
 
