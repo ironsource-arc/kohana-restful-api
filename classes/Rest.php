@@ -23,7 +23,7 @@ abstract class Rest extends Controller_Rest {
         if( $this->request->param('business_id') )
         {
             $this->business = $this->user->businesses->where(
-            'id', '=', $this->request->param('business_id')
+                'id', '=', $this->request->param('business_id')
             )->find();
 
             if( !$this->business->loaded() )
@@ -100,8 +100,8 @@ abstract class Rest extends Controller_Rest {
                 if( count( $pairs ) == 2 && in_array($pairs[0], $this->_fetchable_fields) )
                 {
                     $this->filters[$pairs[0]] = array(
-                    'operator'  => '=',
-                    'value'     => $pairs[1]
+                        'operator'  => '=',
+                        'value'     => $pairs[1]
                     );
                 }
                 else
