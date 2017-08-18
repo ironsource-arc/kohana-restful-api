@@ -2,12 +2,12 @@
 
 abstract class Rest extends Controller_Rest {
 
-	public function before()
-	{
+    public function before()
+    {
         parent::before();
 
         self::load_user();      // load user object
-       
+
         self::load_offset();    // load pagination offset
 
         self::load_limit();     // load pagination limit
@@ -15,7 +15,7 @@ abstract class Rest extends Controller_Rest {
         self::load_sort();      // load sort column
 
         self::load_order();     // load sort order
-        
+
         self::load_fields();    // load fetch fields
 
         self::load_filters();   // load search filters
@@ -23,12 +23,12 @@ abstract class Rest extends Controller_Rest {
         if( $this->request->param('business_id') )
         {
             $this->business = $this->user->businesses->where(
-                'id', '=', $this->request->param('business_id')
+            'id', '=', $this->request->param('business_id')
             )->find();
-             
+
             if( !$this->business->loaded() )
             {
-                throw new Kohana_HTTP_Exception_400('Bad Request');
+                throw new Kohana_HTTP_Exception_400('Bad Request: Access denied');
             }
         }
     }
@@ -56,9 +56,13 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_sort()
     {
-        if( isset($this->_params['sort']) )
+        if( isset($this->_params['sort']) && in_array($this->_params['sort'], $this->_fetchable_fields) )
         {
             $this->sort_column = $this->_params['sort'];
+        }
+        else
+        {
+            throw new Kohana_HTTP_Exception_400('Bad Request: Sort column is not fetchable');
         }
     }
 
@@ -88,95 +92,98 @@ abstract class Rest extends Controller_Rest {
         if( isset($this->_params['filters']) && $this->_params['filters'] != '' )
         {
             $this->filters = array();
-            foreach( explode(',', $this->_params['filters']) as $filter ) {
-                
+
+            foreach( explode(',', $this->_params['filters']) as $filter )
+            {
                 $pairs = explode( '=', $filter );
+
                 if( count( $pairs ) == 2 && in_array($pairs[0], $this->_fetchable_fields) )
                 {
                     $this->filters[$pairs[0]] = array(
-                        'operator'  => '=',
-                        'value'     => $pairs[1]
+                    'operator'  => '=',
+                    'value'     => $pairs[1]
                     );
                 }
                 else
                 {
-                    throw new Kohana_HTTP_Exception_400('Bad Request');
+                    throw new Kohana_HTTP_Exception_400('Bad Request: Filter is not available');
                 }
             }
         }
     }
-    
+
     protected function load_results( $resources )
     {
-        $conditions = $this->filters;
-
         $order = array(
             $this->sort_column => $this->sort_order
         );
 
         return self::load_conditions(
-            $resources, $conditions, $order, $this->pagination_offset, $this->pagination_limit
+            $resources, $this->filters, $order, $this->pagination_offset, $this->pagination_limit
         );
     }
 
-	/**
-	 * Get rows determined by where clauses
-     * @param	Array	$conditions
-     * Simple:
-     * array('field1' => $value1, 'field2' => $value2)
-     * Advanced:
-     * array(
-     *      id' => array(
-     *          'relation' => 'OR'          // 'AND', 'OR', default 'AND',
-     *          'operator' = 'like',        // <, >, =, in, between
-     *          'value' => '123',	        // in case of between: array( 25, 30 )
-     *      )
-     *  )
-	 * @param 	Array	$order    optional: array('field1' => 'DESC', 'field2' => 'ASC')
-	 * @return	FALSE | Database_MySQL_Result
-	 */
-	public function load_conditions( $resources, $conditions, $order = NULL, $offset, $limit )
+    /**
+    * Get rows determined by where clauses
+    * @param	Array	$conditions
+    * Simple:
+    * array('field1' => $value1, 'field2' => $value2)
+    * Advanced:
+    * array(
+    *      id' => array(
+    *          'relation' => 'OR'          // 'AND', 'OR', default 'AND',
+    *          'operator' = 'like',        // <, >, =, in, between
+    *          'value' => '123',	        // in case of between: array( 25, 30 )
+    *      )
+    *  )
+    * @param 	Array	$order    optional: array('field1' => 'DESC', 'field2' => 'ASC')
+    * @return	FALSE | Database_MySQL_Result
+    */
+    public function load_conditions( $resources, $conditions = NULL, $order = NULL, $offset = NULL, $limit = NULL )
     {
-		// build the where clause
-		foreach($conditions as $field => $condition)
+        if( is_array($conditions) )
         {
-			// treat a simple condition
-			if( !is_array($condition) )
-			{
-				$resources->where( $field, "=", $condition );
-			}
-			else
-			{
-				$relation = "and_where";
-				if(array_key_exists("relation", $condition) && strtolower($condition["relation"]) == "or")
-				{
-					$relation = "or_where";
-				}
+            foreach($conditions as $field => $condition)
+            {
+                // treat a simple condition
+                if( !is_array($condition) )
+                {
+                    $resources->where( $field, "=", $condition );
+                }
+                else
+                {
+                    $relation = "and_where";
 
-				$resources->$relation( $field, $condition["operator"], $condition["value"] );
-			}
-		}
+                    if(array_key_exists("relation", $condition) && strtolower($condition["relation"]) == "or")
+                    {
+                        $relation = "or_where";
+                    }
 
-		// set the optional order clause
-		if( $order )
-		{
-			foreach($order as $field => $direction)
-			{
-				$resources->order_by($field, $direction);
-			}
+                    $resources->$relation( $field, $condition["operator"], $condition["value"] );
+                }
+            }
+        }
+
+        // set the optional order clause
+        if( $order )
+        {
+            foreach($order as $field => $direction)
+            {
+                $resources->order_by($field, $direction);
+            }
         }
 
         if( $offset )
         {
             $resources->offset( $offset );
         }
-        
+
         if( $limit )
         {
             $resources->limit( $limit );
         }
 
-		return $resources->find_all();
-	}
+        return $resources->find_all();
+    }
 
 }   // End
