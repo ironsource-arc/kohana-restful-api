@@ -40,7 +40,7 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_offset()
     {
-        if( isset($this->_params['offset']) )
+        if( isset($this->_params['offset']) && $this->_params['offset'] != '' )
         {
             $this->pagination_offset = $this->_params['offset'];
         }
@@ -48,7 +48,7 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_limit()
     {
-        if( isset($this->_params['limit']) )
+        if( isset($this->_params['limit']) && $this->_params['limit'] != '' )
         {
             $this->pagination_limit = $this->_params['limit'];
         }
@@ -56,23 +56,30 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_sort()
     {
-        if( isset($this->_params['sort']) && in_array($this->_params['sort'], $this->_fetchable_fields) )
+        if( isset($this->_params['sort']) && $this->_params['sort'] != '' )
         {
-            $this->sort_column = $this->_params['sort'];
-        }
-        else
-        {
-            throw new Kohana_HTTP_Exception_400('Bad Request: Sort column is not fetchable');
+            if( in_array($this->_params['sort'], $this->_fetchable_fields) )
+            {
+                $this->sort_column = $this->_params['sort'];
+            }
+            else
+            {
+                throw new Kohana_HTTP_Exception_400('Bad Request: Sort column is not fetchable');
+            }
         }
     }
 
     protected function load_order()
     {
-        if( isset($this->_params['order']) )
+        if( isset($this->_params['order']) && $this->_params['order'] != '' )
         {
             if( $this->_params['order'] == 'asc' || $this->_params['order'] == 'desc' )
             {
                 $this->sort_order = $this->_params['order'];
+            }
+            else
+            {
+                throw new Kohana_HTTP_Exception_400('Bad Request: Invalid Order');
             }
         }
     }
@@ -84,6 +91,14 @@ abstract class Rest extends Controller_Rest {
         if( isset($this->_params['fields']) && $this->_params['fields'] != '' )
         {
             $this->fields = explode(',', $this->_params['fields']);
+            
+            foreach( $this->fields as $field )
+            {
+                if( !in_array($field, $this->_fetchable_fields) )
+                {
+                    throw new Kohana_HTTP_Exception_400("Bad Request: Field '$field' is not fetchable");
+                }
+            }
         }
     }
 
