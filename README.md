@@ -33,15 +33,27 @@ After enabling the module in `Kohana::modules`, you must create a route for your
 
 Recommended bootstrap route:
 
-	Route::set('default', '<version>(/<directory>)/<controller>(.<format>)',
-		array(
-			'version' => 'v1',
-			'format'  => '(json|xml|csv|html)',
-		))
-		->defaults(array(
-			'format' => 'json',
-		));
-		
+	// Independent resources like, Businesses, Users etc., will hit this route
+	Route::set('resource', '<directory>/<controller>(/<id>)',
+	   array(
+		   'directory'  => 'v1',
+		   'controller' => '(businesses|users)',
+		   'format'     => '(json|xml|csv|html)',
+	   ))
+	   ->defaults(array(
+		   'format' => 'json'
+	   ));
+
+	// Dependent resources like, customers, classes etc., will hit this route.
+	Route::set('subresource', '<directory>/businesses/<business_id>/<controller>(/<id>)',
+	   array(
+		   'directory' => 'v1',
+		   'format'  => '(json|xml|csv|html)',
+	   ))
+	   ->defaults(array(
+		   'format' => 'json'
+	   ));
+
 ### Controllers
 
 Each REST controller in your app must extend `REST`. Your controller will then have access to the following variables:
