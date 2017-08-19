@@ -19,17 +19,22 @@ abstract class Rest extends Controller_Rest {
         self::load_fields();    // load fetch fields
 
         self::load_filters();   // load search filters
+    }
 
-        if( $this->request->param('business_id') )
+    protected function load_subresource( $resources )
+    {
+        if( $this->request->param( $this->subresource_key ) )
         {
-            $this->business = $this->user->businesses->where(
-                'id', '=', $this->request->param('business_id')
+            $resource = $resources->where(
+                'id', '=', $this->request->param( $this->subresource_key )
             )->find();
 
-            if( !$this->business->loaded() )
+            if( !$resource->loaded() )
             {
                 throw new Kohana_HTTP_Exception_400('Bad Request: Access denied');
             }
+
+            return $resource;
         }
     }
 
@@ -129,13 +134,61 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_results( $resources )
     {
-        $order = array(
-            $this->sort_column => $this->sort_order
-        );
+        if( $this->request->param( $this->resource_key ) )
+        {
+            $resource = $resources->where(
+                'id', '=', $this->request->param( $this->resource_key )
+            )->find();
 
-        return self::load_conditions(
-            $resources, $this->filters, $order, $this->pagination_offset, $this->pagination_limit
-        );
+            if( !$resource->loaded() )
+            {
+                throw new Kohana_HTTP_Exception_400('Bad Request: Access denied');
+            }
+
+            return $resource;
+        }
+        else
+        {
+            // set meta information which has to be appended to response
+            $this->metadata['pagination']['offset'] = $this->pagination_offset;
+            $this->metadata['pagination']['limit'] = $this->pagination_limit;
+            
+            $order = array(
+                $this->sort_column => $this->sort_order
+            );
+
+            return self::load_conditions(
+                $resources, $this->filters, $order, $this->pagination_offset, $this->pagination_limit
+            );
+        }
+    }
+
+    public function fetch_data()
+    {
+        $data = array();        // will hold class data
+
+        if( count( $this->resources ) == 1 )
+        {
+            foreach( $this->fields as $field )
+            {
+                $data[$field] = $this->resources->get($field);
+            }
+        }
+        else
+        {
+            $temp = array();
+
+            foreach( $this->resources as $resource )
+            {
+                foreach( $this->fields as $field )
+                {
+                    $temp[$field] = $resource->get($field);
+                }
+                $data[] = $temp;
+            }
+        }
+
+        return $data;
     }
 
     /**
