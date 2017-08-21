@@ -2,6 +2,13 @@
 
 abstract class Rest extends Controller_Rest {
 
+    /**
+     * Supported operators for filters
+     *
+     * @var Array
+     */
+    protected $operators = array( '=', '>', '<' );
+
     public function before()
     {
         parent::before();
@@ -19,23 +26,6 @@ abstract class Rest extends Controller_Rest {
         self::load_fields();    // load fetch fields
 
         self::load_filters();   // load search filters
-    }
-
-    protected function load_subresource( $resources )
-    {
-        if( $this->request->param( $this->subresource_key ) )
-        {
-            $resource = $resources->where(
-                'id', '=', $this->request->param( $this->subresource_key )
-            )->find();
-
-            if( !$resource->loaded() )
-            {
-                throw new Kohana_HTTP_Exception_400('Bad Request: Access denied');
-            }
-
-            return $resource;
-        }
     }
 
     protected function load_user()
@@ -69,7 +59,8 @@ abstract class Rest extends Controller_Rest {
             }
             else
             {
-                throw new Kohana_HTTP_Exception_400('Bad Request: Sort column is not fetchable');
+                $khe = new Kohana_HTTP_Exception_400('Bad Request: Sort column is not fetchable');
+                $this->_error($khe);
             }
         }
     }
@@ -84,7 +75,8 @@ abstract class Rest extends Controller_Rest {
             }
             else
             {
-                throw new Kohana_HTTP_Exception_400('Bad Request: Invalid Order');
+                $khe = new Kohana_HTTP_Exception_400('Bad Request: Invalid Order');
+                $this->_error($khe);
             }
         }
     }
@@ -101,7 +93,8 @@ abstract class Rest extends Controller_Rest {
             {
                 if( !in_array($field, $this->_fetchable_fields) )
                 {
-                    throw new Kohana_HTTP_Exception_400("Bad Request: Field '$field' is not fetchable");
+                    $khe = new Kohana_HTTP_Exception_400("Bad Request: Field '$field' is not fetchable");
+                    $this->_error($khe);
                 }
             }
         }
@@ -115,18 +108,27 @@ abstract class Rest extends Controller_Rest {
 
             foreach( explode(',', $this->_params['filters']) as $filter )
             {
-                $pairs = explode( '=', $filter );
+                for( $i = 0; $i < count($this->operators); $i++)
+                {
+                    if( strpos( $filter, $this->operators[$i] ) )
+                    {
+                        $operator = $this->operators[$i];
+                    }
+                }
+
+                $pairs = explode( $operator, $filter );
 
                 if( count( $pairs ) == 2 && in_array($pairs[0], $this->_fetchable_fields) )
                 {
                     $this->filters[$pairs[0]] = array(
-                        'operator'  => '=',
+                        'operator'  => $operator,
                         'value'     => $pairs[1]
                     );
                 }
                 else
                 {
-                    throw new Kohana_HTTP_Exception_400('Bad Request: Filter is not available');
+                    $khe = new Kohana_HTTP_Exception_400('Bad Request: Filter is not available');
+                    $this->_error($khe);
                 }
             }
         }
@@ -134,15 +136,16 @@ abstract class Rest extends Controller_Rest {
 
     protected function load_results( $resources )
     {
-        if( $this->request->param( $this->resource_key ) )
+        if( $this->request->param( $this->subresource_key ) )
         {
             $resource = $resources->where(
-                'id', '=', $this->request->param( $this->resource_key )
+                'id', '=', $this->request->param( $this->subresource_key )
             )->find();
 
             if( !$resource->loaded() )
             {
-                throw new Kohana_HTTP_Exception_400('Bad Request: Access denied');
+                $khe = new Kohana_HTTP_Exception_400('Bad Request: Access denied');
+                $this->_error($khe);
             }
 
             return $resource;
