@@ -106,6 +106,8 @@ abstract class Rest extends Controller_Rest {
         {
             $this->filters = array();
 
+            $operator = '=';        // default operator
+
             foreach( explode(',', $this->_params['filters']) as $filter )
             {
                 for( $i = 0; $i < count($this->operators); $i++)
@@ -127,25 +129,28 @@ abstract class Rest extends Controller_Rest {
                 }
                 else
                 {
-                    $khe = new Kohana_HTTP_Exception_400('Bad Request: Filter is not available');
+                    $khe = new Kohana_HTTP_Exception_400("Bad Request: '$pairs[0]' is not a valid filter");
                     $this->_error($khe);
                 }
             }
         }
     }
 
-    protected function load_results( $resources )
+    protected function load_results( $resources, $table = NULL )
     {
         if( $this->request->param( $this->subresource_key ) )
         {
+            $table = !is_null($table) ? $table. '.': '';
+
             $resource = $resources->where(
-                'id', '=', $this->request->param( $this->subresource_key )
+                $table . 'id', '=', $this->request->param( $this->subresource_key )
             )->find();
 
             if( !$resource->loaded() )
             {
                 $khe = new Kohana_HTTP_Exception_400('Bad Request: Access denied');
                 $this->_error($khe);
+                throw $khe;
             }
 
             return $resource;
@@ -153,8 +158,8 @@ abstract class Rest extends Controller_Rest {
         else
         {
             // set meta information which has to be appended to response
-            $this->metadata['pagination']['offset'] = $this->pagination_offset;
-            $this->metadata['pagination']['limit'] = $this->pagination_limit;
+            $this->metadata['offset'] = $this->pagination_offset;
+            $this->metadata['limit'] = $this->pagination_limit;
             
             $order = array(
                 $this->sort_column => $this->sort_order
